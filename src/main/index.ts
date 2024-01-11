@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow, globalShortcut, clipboard } from 'electron'
 import { join } from 'path'
+import { fetch } from 'undici'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { Key, keyboard } from '@nut-tree/nut-js'
@@ -51,19 +52,6 @@ type OllamaResponse = {
   eval_duration: number
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-
-// /**
-//  * Parse Ollama Host URL from preferences.
-//  * @returns {string} Parsed Ollama Host route
-//  */
-// function parseOllamaHostUrl(): string {
-//   let url: string;
-//   url = (preferences.ollamaHost as string).replace("localhost", "127.0.0.1");
-//   if (url[url.length - 1] !== "/") url += "/";
-//   return url;
-// }
 
 async function getFixedText(selectedText: string) {
   try {
@@ -72,12 +60,11 @@ async function getFixedText(selectedText: string) {
       method: 'POST',
       body: JSON.stringify({
         model: 'mistral',
-        stream: true,
+        stream: false,
         format: 'json',
         prompt: `[INST] Fix grammar and spelling mistakes in this text. Return fixed text only. [\\INST]${selectedText}`
       })
     })
-
 
     try {
       const data = (await response.json()) as OllamaResponse
@@ -96,6 +83,13 @@ function wait(timeInMs: number) {
   return new Promise((resolve) => setTimeout(resolve, timeInMs))
 }
 
+async function type(...keys: Key[]) {
+  await keyboard.pressKey(...keys)
+  await keyboard.releaseKey(...keys)
+}
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
@@ -108,15 +102,9 @@ app.whenReady().then(() => {
      * To select an entire line, between line breaks (aka a paragraph):
      * @see https://apple.stackexchange.com/questions/285113/is-there-a-mac-keyboard-shortcut-to-select-current-line
      */
-    // await keyboard.type(Key.LeftShift, Key.LeftAlt, Key.Up)
-    // await keyboard.pressKey(Key.LeftShift, Key.LeftAlt, Key.Up)
-    await keyboard.pressKey(Key.LeftShift, Key.Home,)
-    await keyboard.releaseKey(Key.LeftShift, Key.Home,)
+    await type(Key.LeftShift, Key.Home)
 
-    await keyboard.pressKey(Key.LeftCmd, Key.C)
-    await keyboard.releaseKey(Key.LeftCmd, Key.C)
-
-    console.log('await keyboard.type(Key.LeftCmd, Key.C)') // Copy the selected text
+    await type(Key.LeftCmd, Key.C)
 
     const selectedText = clipboard.readText()
 
@@ -125,8 +113,8 @@ app.whenReady().then(() => {
     console.log({ data })
 
     clipboard.writeText(data.response)
-    await keyboard.pressKey(Key.LeftCmd, Key.V)
-    await keyboard.releaseKey(Key.LeftCmd, Key.V)
+
+    await type(Key.LeftCmd, Key.V)
 
     clipboard.writeText(currentClipboardContent)
   })
