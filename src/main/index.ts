@@ -42,8 +42,11 @@ const WAIT_THRESHOLD = 200
 type OllamaResponse = {
   model: string
   created_at: string
-  response: string
-  done: true
+  message: {
+    role: string
+    content: string
+  }
+  done: boolean
   total_duration: number
   load_duration: number
   prompt_eval_count: number
@@ -52,17 +55,25 @@ type OllamaResponse = {
   eval_duration: number
 }
 
-
 async function getFixedText(selectedText: string) {
   try {
-    const response = await fetch('http://127.0.0.1:11434/api/generate', {
+    const response = await fetch('http://127.0.0.1:11434/api/chat', {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
       body: JSON.stringify({
         model: 'mistral',
         stream: false,
-        format: 'json',
-        prompt: `[INST] Fix grammar and spelling mistakes in this text. Return fixed text only. [\\INST]${selectedText}`
+        messages: [
+          {
+            role: 'assistant',
+            content: `Act as a writer. Fix the following text from spelling and grammar error.
+             Output with no introduction, no explanations - only the fixed text.`
+          },
+          {
+            role: 'user',
+            content: selectedText
+          }
+        ]
       })
     })
 
@@ -112,7 +123,7 @@ app.whenReady().then(() => {
 
     console.log({ data })
 
-    clipboard.writeText(data.response)
+    clipboard.writeText(data.message.content)
 
     await type(Key.LeftCmd, Key.V)
 
