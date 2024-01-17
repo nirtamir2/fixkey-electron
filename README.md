@@ -1,12 +1,17 @@
 # fixkey-electron
 
-An Electron application with Solid and TypeScript
+This project mimics fixKey.
+It allows fixing grammar and typos with a single shortcuts - no matter which app you are using.
+It does it with Electron, so it's a cross-platform (but overkill).
+I may convert this project to tauri to have better performance and small installation size.
 
-## Recommended IDE Setup
+Usage: Click `Option+S` to fix text.
+It will select the text, copy to clipboard and replace the content with AI response from Ollama to fix the text.
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+![demo](./docs/demo.mp4)
 
-## Project Setup
+## Development
+Make sure you have [Ollama](https://ollama.ai/) installed
 
 ### Install
 
