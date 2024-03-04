@@ -8,6 +8,8 @@ I may convert this project to tauri to have better performance and small install
 Usage: Click `Option+S` to fix text.
 It will select the text, copy to clipboard and replace the content with AI response from Ollama to fix the text.
 
+https://github.com/nirtamir2/fixkey-electron/assets/16452789/bc41cd0a-b36f-4c87-8ecc-700613a178fb
+
 ![demo](./docs/demo.mp4)
 
 ## Development
